@@ -1,0 +1,56 @@
+<table border=1 cellspacing=0 cellpadding=0>
+  <tr>
+    <th>Pro Server</th>
+    <th>Version</th>
+    <th>Commit Time</th>
+    <th>Check Time</th>
+    <th colspan="100">Health Indicator</th>
+  </tr>
+
+  <tr *ngFor="let pair of serverStatuses">
+    <th class="statusitem"
+        [class.statusitem-is-ok]="pair.status?.healthy">
+      {{ pair.server.name }}
+    </th>
+
+    <ng-container *ngIf="pair.status; else noStatus">
+      <th>
+        <ng-container *ngIf="pair.status.version.commitDistance == 0; else branchVersion">
+          {{ pair.status.version.projectVersion }}
+        </ng-container>
+        <ng-template #branchVersion>
+          {{ pair.status.version.branch }}
+        </ng-template>
+      </th>
+
+      <td>
+          {{ pair.status.version.commitTime | date:'short' }}
+      </td>
+
+      <td>
+          {{ pair.checkTime | date:'short' }}
+      </td>
+
+      <td *ngFor="let item of pair.status.pairs"
+          class="statusitem"
+          [class.statusitem-is-ok]="item.second.healthy"
+      >
+        {{ item.second.label }}
+      </td>
+    </ng-container>
+
+    <ng-template #noStatus>
+      <th colspan="100">
+        No Data
+      </th>
+    </ng-template>
+  </tr>
+
+  <tr>
+    <td colspan="100" class="progress">
+      <div class="progress-x-bar"
+          [style.width]="nextUpdatePercent + '%'"
+      ></div>
+    </td>
+  </tr>
+</table>
